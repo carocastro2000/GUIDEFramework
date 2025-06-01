@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GUIDE Feedback Prompt Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2em;
+      max-width: 900px;
+      margin: auto;
+      line-height: 1.5;
+    }
+    h1 { font-size: 1.8em; color: #333; }
+    label { font-weight: bold; display: block; margin-top: 1em; }
+    textarea, input, select {
+      width: 100%; padding: 0.5em; margin-top: 0.3em;
+      box-sizing: border-box;
+      font-family: inherit;
+      font-size: 1em;
+    }
+    button {
+      margin-top: 2em;
+      padding: 0.6em 1em;
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 1em;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #004a99;
+    }
+    #output {
+      white-space: pre-wrap;
+      margin-top: 2em;
+      border: 1px solid #ccc;
+      padding: 1em;
+      min-height: 200px;
+      font-family: monospace;
+      font-size: 0.9em;
+      background-color: #f9f9f9;
+      border-radius: 4px;
+    }
+    #licenseNotice {
+      font-size: 0.9em;
+      color: #555;
+      margin-top: 1.5em;
+      border-top: 1px solid #ccc;
+      padding-top: 1em;
+    }
+    a {
+      color: #0066cc;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>GUIDE Feedback Prompt Generator</h1>
+
+  <p>This app helps educators create inclusive, evidence-based feedback prompts using the <strong>GUIDE Framework</strong>. It is designed to support—not replace—educators’ voices and expertise. The prompts are compatible with generative AI tools like ChatGPT, Claude, Gemini, and Perplexity.</p>
+
+  <p>Learn more about the GUIDE Framework at: <a href="https://www.pegasusteacheracademy.com/guideframeworkforfeedback" target="_blank" rel="noopener noreferrer">https://www.pegasusteacheracademy.com/guideframeworkforfeedback</a></p>
+
+  <!-- [form inputs here, unchanged] -->
+  <label for="level">Educational Level</label>
+  <select id="level" name="level">
+    <option value="Undergraduate">Undergraduate</option>
+    <option value="Master’s">Master’s</option>
+    <option value="Doctorate">Doctorate</option>
+    <option value="Other">Other (specify below)</option>
+  </select>
+  <input type="text" id="levelOther" name="levelOther" placeholder="If Other, type level here..." />
+
+  <label for="subject">Subject / Discipline</label>
+  <input type="text" id="subject" name="subject" />
+
+  <label for="role">Educator Role</label>
+  <select id="role" name="role">
+    <option>Educator</option>
+    <option>Mentor</option>
+    <option>Supervisor</option>
+    <option>Tutor</option>
+  </select>
+
+  <label for="studentType">Student Type (select one or more)</label>
+  <select id="studentType" name="studentType" multiple size="8">
+    <option>General Student</option>
+    <option>ADHD</option>
+    <option>Dyslexic</option>
+    <option>Autistic Student</option>
+    <option>Other Neurodivergent Student</option>
+    <option>Second Language Learner</option>
+    <option>Gifted</option>
+    <option>Experiencing Academic Challenges</option>
+    <option>First-Generation College Student</option>
+    <option>Low-Income / Working Student</option>
+    <option>Student with Disability</option>
+    <option>BIPOC / Racially Minoritized Student</option>
+    <option>Queer / LGBTQIA+ Student</option>
+  </select>
+
+  <label for="customNotes">Custom Notes (optional)</label>
+  <textarea id="customNotes" name="customNotes" rows="2"></textarea>
+
+  <label for="instructions">Assignment Instructions</label>
+  <textarea id="instructions" name="instructions" rows="3"></textarea>
+
+  <label for="rubric">Rubric / Assessment Criteria (optional)</label>
+  <textarea id="rubric" name="rubric" rows="3"></textarea>
+
+  <label for="grading">Include Grading Suggestion?</label>
+  <select id="grading" name="grading">
+    <option value="Yes">Yes</option>
+    <option value="No">No</option>
+  </select>
+
+  <label for="hasAttachment">Include Attached Student Work?</label>
+  <select id="hasAttachment" name="hasAttachment">
+    <option value="Yes">Yes</option>
+    <option value="No">No</option>
+  </select>
+
+  <label for="studentWork">Student Work (optional for preview)</label>
+  <textarea id="studentWork" name="studentWork" rows="4"></textarea>
+
+  <button onclick="generate()">Generate Prompt</button>
+
+  <div id="output"></div>
+
+  <div id="licenseNotice">
+    <strong>Copyright & License:</strong> All rights reserved. You are welcome to use this prompt generator as-is through this interface. However, the underlying code is proprietary and may not be copied, reused, or redistributed without explicit permission from the author.<br><br>
+    &copy; 2025 Carolina Castro Huercano.
+  </div>
+
+  <script>
+    function generate() {
+      const level = document.getElementById("level").value;
+      const levelOther = document.getElementById("levelOther").value.trim();
+      const subject = document.getElementById("subject").value.trim();
+      const role = document.getElementById("role").value;
+      const studentType = Array.from(document.getElementById("studentType").selectedOptions).map(o => o.value).join(", ");
+      const customNotes = document.getElementById("customNotes").value.trim();
+      const instructions = document.getElementById("instructions").value.trim();
+      const rubric = document.getElementById("rubric").value.trim();
+      const grading = document.getElementById("grading").value;
+      const hasAttachment = document.getElementById("hasAttachment").value;
+      const studentWork = document.getElementById("studentWork").value.trim();
+
+      const guideIntro = `You are an experienced, insightful educator who creates feedback that is inclusive, evidence-based, and grounded in the GUIDE Framework principles.
+
+Compose feedback that integrates all elements of the GUIDE framework naturally and cohesively—without explicitly naming the framework’s parts (e.g., do not use headings or titles like "Guided Recognition" or "Dialogic Engagement"). The feedback should:
+
+- Highlight specific strengths and successes in the work, referencing relevant criteria or disciplinary expectations.
+- Offer clear, concrete, and actionable steps for improvement and future efforts.
+- Use language that conveys high expectations paired with warmth and respect, tailored to the student's context.
+- Include open-ended, reflective questions or prompts that encourage student reflection and dialogue.
+- Provide motivational support that empowers the student's autonomy, resilience, and growth mindset.
+
+Remember: Do not mention or cite the names of researchers or theorists within the feedback.
+
+For more on the GUIDE framework, see: https://www.pegasusteacheracademy.com/guideframeworkforfeedback
+
+`;
+
+      const prompt = `${guideIntro}
+
+Assignment Context:
+- Educational Level: ${level === "Other" ? levelOther || "unspecified" : level}
+- Subject / Discipline: ${subject || "unspecified"}
+- Educator Role: ${role}
+- Student Profile: ${studentType || "unspecified"}${customNotes ? ` (${customNotes})` : ""}
+- Assignment Instructions: ${instructions || "none provided"}
+${rubric ? `- Rubric / Assessment Criteria:\n${rubric}` : ""}
+- Include Grading Suggestion: ${grading}
+- Student Work Attached: ${hasAttachment}
+
+${studentWork ? "Student Work:\n" + studentWork : ""}
+
+Now generate detailed, warm, and constructive feedback based on the above, integrating the GUIDE framework components fluidly and naturally.`;
+
+      document.getElementById("output").innerHTML = `
+        <h2>Generated Prompt</h2>
+        <textarea rows="20" style="width: 100%; font-family: monospace; font-size: 0.9em;">${prompt}</textarea>
+        <button onclick="navigator.clipboard.writeText(document.querySelector('#output textarea').value)">📋 Copy to Clipboard</button>
+      `;
+    }
+  </script>
+
+</body>
+</html>
+
+
